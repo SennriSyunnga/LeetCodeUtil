@@ -1,8 +1,6 @@
 package per.sennri.leetcode.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -118,19 +116,95 @@ public class DeserializeUtil {
 
     // 几个参考写法
 
-    public static Integer[] transformIntArrayToIntegerArray(int[] array){
+    public static Integer[] transformIntArrayToIntegerArray(int[] array) {
         return Arrays.stream(array).boxed().toArray(Integer[]::new);
     }
 
-    public static List<Integer> transformIntArrayToList(int[] array){
+    public static List<Integer> transformIntArrayToList(int[] array) {
         return Arrays.stream(array).boxed().collect(Collectors.toList());
     }
 
-    public static Integer[] transformListToIntegerArray(List<Integer> list){
+    public static Integer[] transformListToIntegerArray(List<Integer> list) {
         return list.toArray(new Integer[0]);
     }
 
-    public static int[] transformListToIntArray(List<Integer> list){
+    public static int[] transformListToIntArray(List<Integer> list) {
         return list.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+
+    /**
+     * 序列化树
+     * @param root
+     * @return
+     */
+    public static String serializeTree(TreeNode root) {
+        if (root == null) {
+            return "[]";
+        }
+        // ArrayDeque不支持null值
+        Deque<TreeNode> layer = new LinkedList<>();
+        StringBuilder sb = new StringBuilder("[");
+        layer.offer(root);
+        int size = layer.size();
+        while (size > 0) {
+            for (int i = 0;i < size;i++){
+                TreeNode node = layer.poll();
+                if (node == null){
+                    sb.append("null").append(",");
+                }else{
+                    sb.append(node.val).append(",");
+                    layer.offer(node.left);
+                    layer.offer(node.right);
+                }
+            }
+            size = layer.size();
+        }
+        int sbLen = sb.length() - 1;
+        // remove ','
+        sb.deleteCharAt(sbLen);
+        sbLen--;
+        while (sb.charAt(sbLen) == 'l'){
+            sb.delete(sbLen - 4, sbLen + 1);
+            sbLen -= 5;
+        }
+        return sb.append(']').toString();
+    }
+
+    /**
+     * 反序列化树
+     * @param data
+     * @return
+     */
+    public static TreeNode deserializeTree(String data) {
+        String[] strings = data.substring(1, data.length() - 1).split("[,]");
+        // do sth here
+        int len = strings.length;
+        String first = strings[0].trim();
+        if ("".equals(first) || "null".equals(first)) {
+            return null;
+        }
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        TreeNode head = new TreeNode(Integer.parseInt(strings[0].trim()));
+        deque.offer(head);
+        boolean isLeft = true;
+        for (int i = 1; i < len; i++) {
+            String s = strings[i].trim();
+            if ("null".equals(s)) {
+                if (!isLeft) {
+                    deque.poll();
+                }
+            } else {
+                TreeNode node = new TreeNode(Integer.parseInt(s));
+                if (isLeft) {
+                    deque.peek().left = node;
+                } else {
+                    deque.poll().right = node;
+                }
+                deque.offer(node);
+            }
+            isLeft = !isLeft;
+        }
+        return head;
     }
 }

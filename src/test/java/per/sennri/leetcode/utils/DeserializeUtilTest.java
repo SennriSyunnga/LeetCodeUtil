@@ -58,4 +58,25 @@ class DeserializeUtilTest {
         int[] test = DeserializeUtil.transformListToIntArray(Arrays.asList(1,2,3,4,5));
         return;
     }
+
+    @Test
+    void deserializeTreeNode() {
+        TreeNode node = DeserializeUtil.deserializeTree("[5, 4, 7, 3, null, 2, null, -1, null, 9]");
+        TreeNode node2 = DeserializeUtil.deserializeTree("[1, null, 2, 3]");
+        return;
+    }
+
+    @Test
+    void serialize() {
+        String data = "[5,4,7,3,null,2,null,-1,null,9]";
+        String s = DeserializeUtil.serializeTree(DeserializeUtil.deserializeTree("[5, 4, 7, 3, null, 2, null, -1, null, 9]"));
+        assert data.equals(s);
+    }
+
+    @Test
+    void serialize2() {
+        String data = "[]";
+        String s = DeserializeUtil.serializeTree(DeserializeUtil.deserializeTree("[]"));
+        assert data.equals(s);
+    }
 }
